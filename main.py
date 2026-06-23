@@ -12,15 +12,15 @@ from rich.text import Text
 console = Console()
 
 BANNER = """
-▄▄▄    ▄▄▄▄▄▄▄    ▄▄▄ ▄▄▄    ▄▄▄  
- ▒▒▒    ░░▌ ░░▌  ▀ ▀█░ ░░▌  ▀ ▀█░ 
- ▐░░▌   ▐░  ▐▒░    ▐░▌ ▐▒░    ▐░▌ 
-  ██▀▄  ▐█   ▓▒▒  ███   ▓▒▒  ███  
-  ░▌▀▀░░▐█     ▓▒░░       ▓▒░░    
-  ▒▌  ▒▒░▌      ▓▒      ▒▓▒  ░▓▒  
- ▐▓▌   ▓▒▒      █▓     ▐▓▌    ▒▓▌ 
- ██▓    ▓▓▌    ▐██▌    ██ ▄   ▐█▓ 
-▀▀▀▀▀    ▀▀    ▀▀▀▀     ▀▀ ▀   ▀▀▀
+  ▄▄▄    ▄▄▄▄  ▄▄▄    ▄▄▄    ▄  ▄▄    ▄▄▄  
+   ▒▒▒    ░░▌   ░░▌  ▀ ▀█░   ░░▌  ▀ ▀█░ 
+   ▐░░▌   ▐░    ▐▒░    ▐░▌   ▐▒░    ▐░▌ 
+    ██▀▄  ▐█     ▓▒▒  ███     ▓▒▒  ███  
+    ░▌▀▀░░▐█       ▓▒░░         ▓▒░░    
+    ▒▌  ▒▒░▌        ▓▒        ▒▓▒  ░▓▒  
+   ▐▓▌   ▓▒▒        █▓       ▐▓▌    ▒▓▌ 
+   ██▓    ▓▓▌      ▐██▌      ██ ▄   ▐█▓ 
+  ▀▀▀▀▀    ▀▀      ▀▀▀▀       ▀▀ ▀   ▀▀▀
 """
 
 def main():
@@ -70,9 +70,19 @@ def main():
         dns = DNSEnum(args.target, verbose=args.verbose, wordlist=args.wordlist)
         results["dns"] = dns.run()
 
+    if "whois" in args.modules:
+        from modules.whois_intel import WHOISIntel
+        w = WHOISIntel(args.target, verbose=args.verbose)
+        results["whois"] = w.run()
+
+    if "ports" in args.modules:
+        from modules.port_scanner import PortScanner
+        ps = PortScanner(args.target, verbose=args.verbose, grab_banner=True)
+        results["ports"] = ps.run()
+
     # Placeholder hooks for future modules
     for module in args.modules:
-        if module != "dns":
+        if module not in ["dns", "whois", "ports"]:
             console.print(f"[dim yellow][!] Module '{module}' not yet implemented — coming soon.[/dim yellow]")
 
     # Output
