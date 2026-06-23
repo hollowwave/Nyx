@@ -12,10 +12,10 @@ from rich.text import Text
 console = Console()
 
 BANNER = """
-  ▄▄▄    ▄▄▄▄  ▄▄▄    ▄▄▄    ▄  ▄▄    ▄▄▄  
-   ▒▒▒    ░░▌   ░░▌  ▀ ▀█░   ░░▌  ▀ ▀█░ 
+  ▄▄▄    ▄▄▄▄  ▄▄▄    ▄▄▄    ▄▄▄    ▄▄▄  
+   ▒▒▒    ░░▌   ░░▌  ▀ ▀█░  ░░▌ ▀  ▀█░ 
    ▐░░▌   ▐░    ▐▒░    ▐░▌   ▐▒░    ▐░▌ 
-    ██▀▄  ▐█     ▓▒▒  ███     ▓▒▒  ███  
+    ██▀▄  ▐█     ▓▒▒  ███     ▓▒▒  ███
     ░▌▀▀░░▐█       ▓▒░░         ▓▒░░    
     ▒▌  ▒▒░▌        ▓▒        ▒▓▒  ░▓▒  
    ▐▓▌   ▓▒▒        █▓       ▐▓▌    ▒▓▌ 
@@ -80,9 +80,14 @@ def main():
         ps = PortScanner(args.target, verbose=args.verbose, grab_banner=True)
         results["ports"] = ps.run()
 
+    if "tech" in args.modules:
+        from modules.web_fingerprint import WebFingerprint
+        wf = WebFingerprint(args.target, verbose=args.verbose)
+        results["tech"] = wf.run()
+
     # Placeholder hooks for future modules
     for module in args.modules:
-        if module not in ["dns", "whois", "ports"]:
+        if module not in ["dns", "whois", "ports", "tech"]:
             console.print(f"[dim yellow][!] Module '{module}' not yet implemented — coming soon.[/dim yellow]")
 
     # Output
