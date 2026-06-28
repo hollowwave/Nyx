@@ -14,7 +14,7 @@ console = Console()
 
 BANNER = """[bold red]
   ▄▄▄    ▄▄▄▄  ▄▄▄    ▄▄▄    ▄▄▄    ▄▄▄  
-   ▒▒▒    ░░▌   ░░▌  ▀ ▀█░  ░░▌ ▀  ▀█░ 
+   ▒▒▒    ░░▌   ░░▌  ▀ ▀█░  ░░▌ ▀  ▀█░
    ▐░░▌   ▐░    ▐▒░    ▐░▌   ▐▒░    ▐░▌
     ██▀▄  ▐█     ▓▒▒  ███     ▓▒▒  ███
     ░▌▀▀░░▐█       ▓▒░░         ▓▒░░    
@@ -25,7 +25,7 @@ BANNER = """[bold red]
 
 VERSION  = "0.7.0"
 CODENAME = "Erebus"
-BUILT_IN = ["dns", "whois", "ports", "tech", "crtsh", "breach", "usernames"]
+BUILT_IN = ["dns", "whois", "ports", "tech", "crtsh", "breach", "usernames", "waf"]
 
 # Dark gothic style for questionary
 NYX_STYLE = Style([
@@ -49,6 +49,7 @@ MODULE_DESCRIPTIONS = {
     "crtsh":     "Certificate transparency subdomain discovery",
     "breach":    "Email/domain breach lookup via HIBP",
     "usernames": "Username search across 21 platforms",
+    "waf":       "WAF detection — passive + active payload probing",
 }
 
 
@@ -273,6 +274,13 @@ def run_scan(args):
         results["breach"] = BreachCheck(
             target=args.target,
             api_key=getattr(args, "hibp_key", None),
+            verbose=args.verbose,
+        ).run()
+
+    if "waf" in args.modules:
+        from modules.waf_detector import WAFDetector
+        results["waf"] = WAFDetector(
+            target=args.target,
             verbose=args.verbose,
         ).run()
 
