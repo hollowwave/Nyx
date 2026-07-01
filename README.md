@@ -2,8 +2,6 @@
 
 **Automated OSINT & Recon Pipeline**
 
-v0.8.0 [Erebus] | Dark. Fast. Modular.
-
 ---
 
 ## ⚠️ LEGAL DISCLAIMER
