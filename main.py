@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+"""
+Nyx - Automated OSINT & Recon Pipeline
+Dark. Fast. Modular.
+"""
+
 import argparse
 import sys
 import time
@@ -19,13 +24,13 @@ BANNER = """[bold red]
     ██▀▄  ▐█     ▓▒▒  ███     ▓▒▒  ███
     ░▌▀▀░░▐█       ▓▒░░         ▓▒░░    
     ▒▌  ▒▒░▌        ▓▒        ▒▓▒  ░▓▒  
-   ▐▓▌   ▓▒▒        █▓       ▐▓▌    ▒▓▌ 
+   ▐▓▌   ▓▒▒        █▓       ▐▓▌    ▒▓▌
    ██▓    ▓▓▌      ▐██▌      ██ ▄   ▐█▓ 
   ▀▀▀▀▀    ▀▀      ▀▀▀▀       ▀▀ ▀   ▀▀▀[/bold red]"""
 
 VERSION  = "0.7.0"
 CODENAME = "Erebus"
-BUILT_IN = ["dns", "whois", "ports", "tech", "crtsh", "breach", "usernames", "waf"]
+BUILT_IN = ["dns", "whois", "ports", "tech", "crtsh", "breach", "usernames", "waf", "email", "dorks", "shodan", "harvest"]
 
 # Dark gothic style for questionary
 NYX_STYLE = Style([
@@ -50,6 +55,11 @@ MODULE_DESCRIPTIONS = {
     "breach":    "Email/domain breach lookup via HIBP",
     "usernames": "Username search across 21 platforms",
     "waf":       "WAF detection — passive + active payload probing",
+    "email":     "SPF/DMARC/DKIM email security audit",
+    "dorks":     "Google Dork query generator for reconnaissance",
+    "shodan":    "Shodan IP lookup — find known vulnerabilities",
+    "harvest":   "Email harvester using Hunter.io API",
+
 }
 
 
@@ -281,6 +291,35 @@ def run_scan(args):
         from modules.waf_detector import WAFDetector
         results["waf"] = WAFDetector(
             target=args.target,
+            verbose=args.verbose,
+        ).run()
+
+    if "dorks" in args.modules:
+        from modules.google_dorks import GoogleDorkGenerator
+        results["dorks"] = GoogleDorkGenerator(
+            domain=args.target, verbose=args.verbose
+        ).run()
+
+    if "shodan" in args.modules:
+        from modules.shodan_lookup import ShodanLookup
+        results["shodan"] = ShodanLookup(
+            target=args.target,
+            api_key=getattr(args, "shodan_key", None),
+            verbose=args.verbose,
+        ).run()
+
+    if "harvest" in args.modules:
+        from modules.email_harvester import EmailHarvester
+        results["harvest"] = EmailHarvester(
+            domain=args.target,
+            api_key=getattr(args, "hunter_key", None),
+            verbose=args.verbose,
+        ).run()
+
+    if "email" in args.modules:
+        from modules.email_security import EmailSecurityChecker
+        results["email"] = EmailSecurityChecker(
+            domain=args.target,
             verbose=args.verbose,
         ).run()
 
